@@ -1,0 +1,44 @@
+{
+  "type": "panel",
+  "i18n": true,
+  "items": {
+    "pollingInterval": {
+      "type": "number",
+      "label": "Polling-Intervall (Minuten)",
+      "min": 5,
+      "max": 1440,
+      "default": 30,
+      "sm": 4
+    },
+    "_spacer": {
+      "type": "divider",
+      "sm": 12
+    },
+    "orders": {
+      "type": "table",
+      "label": "Bestellungen",
+      "sm": 12,
+      "uniqueColumns": ["bagid"],
+      "items": [
+        {
+          "type": "text",
+          "attr": "name",
+          "title": "Name (z.B. 'Fotos Weihnachten 2025')",
+          "width": "40%"
+        },
+        {
+          "type": "text",
+          "attr": "bagid",
+          "title": "Bestellnummer (bagid)",
+          "width": "30%"
+        },
+        {
+          "type": "text",
+          "attr": "outletid",
+          "title": "Filialnummer (outletid)",
+          "width": "30%"
+        }
+      ]
+    }
+  }
+}
