@@ -7,8 +7,6 @@ jest.mock('tough-cookie');
 const axios = require('axios');
 const { fetchOrderStatus } = require('../lib/rossmannApi');
 
-const BASE_URL = 'https://www.rossmann-fotowelt.de';
-
 describe('fetchOrderStatus', () => {
     beforeEach(() => {
         jest.clearAllMocks();
