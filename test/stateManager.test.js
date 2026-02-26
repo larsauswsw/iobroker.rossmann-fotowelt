@@ -49,8 +49,13 @@ describe('updateOrderStates', () => {
             outDate: ''
         });
 
-        expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.status', { val: 'In Bearbeitung', ack: true });
+        expect(adapter.setStateAsync).toHaveBeenCalledTimes(5);
+        expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.status',        { val: 'In Bearbeitung', ack: true });
+        expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.inDate',        { val: '2026-02-20', ack: true });
+        expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.outDate',       { val: '', ack: true });
         expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.statusChanged', { val: false, ack: true });
+        // lastUpdated is an ISO timestamp — just verify it was called
+        expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.lastUpdated', expect.objectContaining({ ack: true }));
     });
 
     it('sets statusChanged=true when status changed', async () => {
@@ -77,5 +82,17 @@ describe('updateOrderStates', () => {
             'orders.12345.status',
             { val: 'Nicht gefunden', ack: true }
         );
+    });
+
+    it('sets statusChanged=false on first poll (no previous state)', async () => {
+        const adapter = makeAdapter();
+        // getStateAsync returns null (default in makeAdapter) — no previous state
+        await updateOrderStates(adapter, { bagid: '12345' }, {
+            status: 'In Bearbeitung',
+            inDate: '2026-02-20',
+            outDate: ''
+        });
+
+        expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.statusChanged', { val: false, ack: true });
     });
 });
