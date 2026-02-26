@@ -13,10 +13,23 @@ class RossmannFotowelt extends utils.Adapter {
     }
 
     async onReady() {
-        const { orders, pollingInterval } = this.config;
+        const { orders: rawOrders, pollingInterval } = this.config;
 
-        if (!orders || orders.length === 0) {
+        if (!rawOrders || rawOrders.length === 0) {
             this.log.warn('Keine Bestellungen konfiguriert. Bitte in der Admin-UI konfigurieren.');
+            return;
+        }
+
+        const orders = rawOrders.filter(o => {
+            if (!o.bagid || !o.outletid) {
+                this.log.warn(`Überspringe Bestellung ohne bagid/outletid: ${JSON.stringify(o)}`);
+                return false;
+            }
+            return true;
+        });
+
+        if (orders.length === 0) {
+            this.log.warn('Keine gültigen Bestellungen. Bitte bagid und outletid in der Admin-UI eintragen.');
             return;
         }
 
@@ -29,12 +42,13 @@ class RossmannFotowelt extends utils.Adapter {
             await this.setStateAsync(`orders.${order.bagid}.name`,     { val: order.name || '', ack: true });
         }
 
-        // Poll immediately, then on interval
-        await this.pollAllOrders(orders);
-
-        const intervalMs = Math.max(5, pollingInterval || 30) * 60 * 1000;
+        const effectiveInterval = Math.max(5, pollingInterval || 30);
+        const intervalMs = effectiveInterval * 60 * 1000;
         this.pollingTimer = setInterval(() => this.pollAllOrders(orders), intervalMs);
-        this.log.info(`Polling alle ${pollingInterval || 30} Minuten gestartet.`);
+        this.log.info(`Polling alle ${effectiveInterval} Minuten gestartet.`);
+
+        // Poll immediately without blocking onReady (retry waits can take up to 15+ minutes)
+        this.pollAllOrders(orders).catch(err => this.log.error(`Initial poll failed: ${err.message}`));
     }
 
     async pollAllOrders(orders) {
@@ -71,11 +85,16 @@ class RossmannFotowelt extends utils.Adapter {
     }
 
     async onUnload(callback) {
-        if (this.pollingTimer) {
-            clearInterval(this.pollingTimer);
-            this.pollingTimer = null;
+        try {
+            if (this.pollingTimer) {
+                clearInterval(this.pollingTimer);
+                this.pollingTimer = null;
+            }
+        } catch (_e) {
+            // ignore cleanup errors
+        } finally {
+            callback();
         }
-        callback();
     }
 }
 

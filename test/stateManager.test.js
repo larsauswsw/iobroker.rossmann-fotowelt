@@ -82,6 +82,8 @@ describe('updateOrderStates', () => {
             'orders.12345.status',
             { val: 'Nicht gefunden', ack: true }
         );
+        expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.inDate',  { val: '', ack: true });
+        expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.outDate', { val: '', ack: true });
     });
 
     it('sets statusChanged=false on first poll (no previous state)', async () => {
