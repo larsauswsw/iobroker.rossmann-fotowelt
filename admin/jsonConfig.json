@@ -30,13 +30,15 @@
           "type": "text",
           "attr": "bagid",
           "title": "Bestellnummer (bagid)",
-          "width": "30%"
+          "width": "30%",
+          "required": true
         },
         {
           "type": "text",
           "attr": "outletid",
           "title": "Filialnummer (outletid)",
-          "width": "30%"
+          "width": "30%",
+          "required": true
         }
       ]
     }
