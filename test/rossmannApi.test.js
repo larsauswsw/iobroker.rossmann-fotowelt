@@ -19,11 +19,13 @@ describe('fetchOrderStatus', () => {
             get: jest.fn().mockResolvedValue({ status: 200 }),
             post: jest.fn().mockResolvedValue({
                 data: {
-                    bagTrackingData: {
-                        bagOrder: {
-                            status: 'Abholbereit',
-                            inDate: '2026-02-20',
-                            outDate: '2026-02-25'
+                    data: {
+                        bagTrackingData: {
+                            bagOrder: {
+                                status: 'Abholbereit',
+                                inDate: '2026-02-20',
+                                outDate: '2026-02-25'
+                            }
                         }
                     }
                 }
@@ -42,7 +44,9 @@ describe('fetchOrderStatus', () => {
             get: jest.fn().mockResolvedValue({ status: 200 }),
             post: jest.fn().mockResolvedValue({
                 data: {
-                    bagTrackingData: null
+                    data: {
+                        bagTrackingData: {}
+                    }
                 }
             })
         });
