@@ -69,12 +69,11 @@ describe('updateOrderStates', () => {
         expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.lastUpdated', expect.objectContaining({ ack: true }));
     });
 
-    it('sets statusChanged=true when status changed', async () => {
+    it('sets statusChanged=true when status changed and returns it', async () => {
         const adapter = makeAdapter();
-        // Previous status was different
-        adapter.getStateAsync.mockResolvedValue({ val: 'In Bearbeitung' });
+        adapter.getStateAsync.mockResolvedValue({ val: 'Eingegangen' });
 
-        await updateOrderStates(adapter, { bagid: '12345' }, {
+        const result = await updateOrderStates(adapter, { bagid: '12345' }, {
             status: 'Abholbereit',
             inDate: '2026-02-20',
             outDate: '2026-02-25',
@@ -82,6 +81,7 @@ describe('updateOrderStates', () => {
         });
 
         expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.statusChanged', { val: true, ack: true });
+        expect(result).toEqual({ statusChanged: true });
     });
 
     it('sets status to "Nicht gefunden" when apiData is null', async () => {

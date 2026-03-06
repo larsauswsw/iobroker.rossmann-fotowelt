@@ -38,7 +38,9 @@
   },
   "native": {
     "pollingInterval": 30,
-    "orders": []
+    "orders": [],
+    "pushoverEnabled": false,
+    "pushoverInstance": ""
   },
   "objects": [],
   "instanceObjects": []

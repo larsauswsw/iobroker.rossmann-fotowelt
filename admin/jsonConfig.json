@@ -10,7 +10,24 @@
       "default": 30,
       "sm": 4
     },
-    "_spacer": {
+    "_spacer1": {
+      "type": "divider",
+      "sm": 12
+    },
+    "pushoverEnabled": {
+      "type": "checkbox",
+      "label": "Pushover-Benachrichtigung bei Statusänderung",
+      "default": false,
+      "sm": 12
+    },
+    "pushoverInstance": {
+      "type": "instance",
+      "adapter": "pushover",
+      "label": "Pushover-Instanz",
+      "sm": 6,
+      "hidden": "!data.pushoverEnabled"
+    },
+    "_spacer2": {
       "type": "divider",
       "sm": 12
     },

@@ -64,11 +64,14 @@ class RossmannFotowelt extends utils.Adapter {
         while (retries < 3) {
             try {
                 const data = await fetchOrderStatus(order);
-                await updateOrderStates(this, order, data);
+                const { statusChanged } = await updateOrderStates(this, order, data);
                 if (data) {
                     this.log.info(`Bestellung ${order.bagid}: Status = "${data.status}"`);
                 } else {
                     this.log.warn(`Bestellung ${order.bagid}: Nicht gefunden.`);
+                }
+                if (statusChanged) {
+                    this.sendPushover(order, data);
                 }
                 return;
             } catch (err) {
@@ -82,6 +85,21 @@ class RossmannFotowelt extends utils.Adapter {
         // After 3 failures
         this.log.error(`Bestellung ${order.bagid}: Abfrage nach 3 Versuchen fehlgeschlagen.`);
         await this.setStateAsync(`orders.${order.bagid}.status`, { val: 'Fehler: Keine Verbindung', ack: true });
+    }
+
+    sendPushover(order, data) {
+        const { pushoverEnabled, pushoverInstance } = this.config;
+        if (!pushoverEnabled || !pushoverInstance) return;
+
+        const label = order.name || order.bagid;
+        const status = data ? data.status : 'Nicht gefunden';
+        const message = `Bestellung "${label}": Status ist jetzt "${status}"`;
+
+        this.sendTo(`pushover.${pushoverInstance}`, 'send', {
+            message,
+            title: 'Rossmann Fotowelt'
+        });
+        this.log.info(`Pushover gesendet: ${message}`);
     }
 
     async onUnload(callback) {
