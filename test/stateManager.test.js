@@ -15,8 +15,8 @@ describe('createOrderStates', () => {
         const adapter = makeAdapter();
         await createOrderStates(adapter, { bagid: '12345', outletid: '678', name: 'Test' });
 
-        // Should create channel + 8 states
-        expect(adapter.setObjectNotExistsAsync).toHaveBeenCalledTimes(9);
+        // Should create channel + 12 states
+        expect(adapter.setObjectNotExistsAsync).toHaveBeenCalledTimes(13);
 
         // Channel call
         expect(adapter.setObjectNotExistsAsync).toHaveBeenCalledWith(
@@ -34,26 +34,37 @@ describe('createOrderStates', () => {
         expect(statePaths).toContain('orders.12345.outDate');
         expect(statePaths).toContain('orders.12345.lastUpdated');
         expect(statePaths).toContain('orders.12345.statusChanged');
+        expect(statePaths).toContain('orders.12345.city');
+        expect(statePaths).toContain('orders.12345.storeName');
+        expect(statePaths).toContain('orders.12345.street');
+        expect(statePaths).toContain('orders.12345.zip');
     });
 });
 
 describe('updateOrderStates', () => {
     it('sets all states and statusChanged=false when status unchanged', async () => {
         const adapter = makeAdapter();
-        // Simulate previous status = 'In Bearbeitung'
-        adapter.getStateAsync.mockResolvedValue({ val: 'In Bearbeitung' });
+        adapter.getStateAsync.mockResolvedValue({ val: 'Eingegangen' });
 
         await updateOrderStates(adapter, { bagid: '12345' }, {
-            status: 'In Bearbeitung',
+            status: 'Eingegangen',
             inDate: '2026-02-20',
-            outDate: ''
+            outDate: '',
+            city: 'Musterstadt',
+            storeName: 'Dirk Rossmann GmbH',
+            street: 'Musterstraße 1',
+            zip: '12345'
         });
 
-        expect(adapter.setStateAsync).toHaveBeenCalledTimes(5);
-        expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.status',        { val: 'In Bearbeitung', ack: true });
+        expect(adapter.setStateAsync).toHaveBeenCalledTimes(9);
+        expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.status',        { val: 'Eingegangen', ack: true });
         expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.inDate',        { val: '2026-02-20', ack: true });
         expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.outDate',       { val: '', ack: true });
         expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.statusChanged', { val: false, ack: true });
+        expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.city',          { val: 'Musterstadt', ack: true });
+        expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.storeName',     { val: 'Dirk Rossmann GmbH', ack: true });
+        expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.street',        { val: 'Musterstraße 1', ack: true });
+        expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.zip',           { val: '12345', ack: true });
         // lastUpdated is an ISO timestamp — just verify it was called
         expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.lastUpdated', expect.objectContaining({ ack: true }));
     });
@@ -66,7 +77,8 @@ describe('updateOrderStates', () => {
         await updateOrderStates(adapter, { bagid: '12345' }, {
             status: 'Abholbereit',
             inDate: '2026-02-20',
-            outDate: '2026-02-25'
+            outDate: '2026-02-25',
+            city: '', storeName: '', street: '', zip: ''
         });
 
         expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.statusChanged', { val: true, ack: true });
@@ -90,9 +102,10 @@ describe('updateOrderStates', () => {
         const adapter = makeAdapter();
         // getStateAsync returns null (default in makeAdapter) — no previous state
         await updateOrderStates(adapter, { bagid: '12345' }, {
-            status: 'In Bearbeitung',
+            status: 'Eingegangen',
             inDate: '2026-02-20',
-            outDate: ''
+            outDate: '',
+            city: '', storeName: '', street: '', zip: ''
         });
 
         expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.statusChanged', { val: false, ack: true });
