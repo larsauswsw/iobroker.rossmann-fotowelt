@@ -22,7 +22,7 @@
     "license": "MIT",
     "platform": "Javascript/Node.js",
     "main": "main.js",
-    "icon": "admin/rossmann-fotowelt.png",
+    "icon": "admin/rossmann-fotowelt.svg",
     "enabled": true,
     "extIcon": "",
     "readme": "",
