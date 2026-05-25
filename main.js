@@ -10,6 +10,7 @@ class RossmannFotowelt extends utils.Adapter {
         this.pollingTimer = null;
         this.on('ready', this.onReady.bind(this));
         this.on('unload', this.onUnload.bind(this));
+        this.on('message', this.onMessage.bind(this));
     }
 
     async onReady() {
@@ -95,11 +96,25 @@ class RossmannFotowelt extends utils.Adapter {
         const status = data ? data.status : 'Nicht gefunden';
         const message = `Bestellung "${label}": Status ist jetzt "${status}"`;
 
-        this.sendTo(`pushover.${pushoverInstance}`, 'send', {
+        this.sendTo(pushoverInstance, 'send', {
             message,
             title: 'Rossmann Fotowelt'
         });
         this.log.info(`Pushover gesendet: ${message}`);
+    }
+
+    onMessage(obj) {
+        if (!obj || obj.command !== 'testPushover') return;
+        const instance = (obj.message && obj.message.pushoverInstance) || this.config.pushoverInstance;
+        if (!instance) {
+            obj.callback && this.sendTo(obj.from, obj.command, { error: 'Keine Pushover-Instanz konfiguriert.' }, obj.callback);
+            return;
+        }
+        this.sendTo(instance, 'send', {
+            message: 'Test-Nachricht vom Rossmann Fotowelt Adapter',
+            title: 'Rossmann Fotowelt'
+        });
+        obj.callback && this.sendTo(obj.from, obj.command, { result: 'Test-Nachricht gesendet!' }, obj.callback);
     }
 
     async onUnload(callback) {

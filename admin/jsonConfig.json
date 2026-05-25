@@ -27,6 +27,15 @@
       "sm": 6,
       "hidden": "!data.pushoverEnabled"
     },
+    "pushoverTest": {
+      "type": "sendTo",
+      "command": "testPushover",
+      "jsonData": "{\"pushoverInstance\": \"${data.pushoverInstance}\"}",
+      "label": "Test senden",
+      "variant": "contained",
+      "hidden": "!data.pushoverEnabled",
+      "sm": 3
+    },
     "_spacer2": {
       "type": "divider",
       "sm": 12
