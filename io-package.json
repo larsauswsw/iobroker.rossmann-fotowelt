@@ -34,7 +34,8 @@
     },
     "connectionType": "cloud",
     "dataSource": "poll",
-    "supportCustoms": false
+    "supportCustoms": false,
+    "messagebox": true
   },
   "native": {
     "pollingInterval": 30,
