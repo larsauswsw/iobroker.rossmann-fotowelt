@@ -105,11 +105,14 @@ class RossmannFotowelt extends utils.Adapter {
 
     onMessage(obj) {
         if (!obj || obj.command !== 'testPushover') return;
+        this.log.info(`testPushover empfangen. obj.message=${JSON.stringify(obj.message)}, config.pushoverInstance=${this.config.pushoverInstance}`);
         const instance = (obj.message && obj.message.pushoverInstance) || this.config.pushoverInstance;
         if (!instance) {
+            this.log.warn('testPushover: keine Pushover-Instanz gefunden.');
             obj.callback && this.sendTo(obj.from, obj.command, { error: 'Keine Pushover-Instanz konfiguriert.' }, obj.callback);
             return;
         }
+        this.log.info(`testPushover: sende an "${instance}"`);
         this.sendTo(instance, 'send', {
             message: 'Test-Nachricht vom Rossmann Fotowelt Adapter',
             title: 'Rossmann Fotowelt'
