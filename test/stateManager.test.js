@@ -98,7 +98,7 @@ describe('updateOrderStates', () => {
         expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.outDate', { val: '', ack: true });
     });
 
-    it('sets statusChanged=false on first poll (no previous state)', async () => {
+    it('sets statusChanged=true on first poll (no previous state)', async () => {
         const adapter = makeAdapter();
         // getStateAsync returns null (default in makeAdapter) — no previous state
         await updateOrderStates(adapter, { bagid: '12345' }, {
@@ -108,6 +108,6 @@ describe('updateOrderStates', () => {
             city: '', storeName: '', street: '', zip: ''
         });
 
-        expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.statusChanged', { val: false, ack: true });
+        expect(adapter.setStateAsync).toHaveBeenCalledWith('orders.12345.statusChanged', { val: true, ack: true });
     });
 });
